@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:form_field_validator/form_field_validator.dart';
+// import 'package:form_field_validator/form_field_validator.dart';
 import 'package:flutter/foundation.dart';
+import 'yourdetails.dart';
 
 void main() => runApp(MaterialApp(
   debugShowCheckedModeBanner: false,
@@ -17,6 +18,14 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
   Map userData = {};
   final _formkey = GlobalKey<FormState>();
+  final nameTxtCnt =TextEditingController();
+  final mobTxtCnt =TextEditingController();
+  final mailTxtCnt =TextEditingController();
+  void nextpage(BuildContext ctx) {
+    Navigator.of(ctx).push(MaterialPageRoute(builder: (_) {
+      return details(name: nameTxtCnt.text, mail: mailTxtCnt.text, mob: mobTxtCnt.text);
+    }));
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,16 +55,15 @@ class _RegisterState extends State<Register> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(12.0),
-                      child: TextFormField(
-                        validator: ((value) {
-                        if (value == null || value.isEmpty) {
-                        	 return 'please enter some text';
-                        } else if (value.length < 5) {
-                        	 return 'Enter atleast 5 Charecter';
-                        }
-
-                        return null;
-                        }),
+                      child: TextFormField(controller: nameTxtCnt,
+                        // validator: ((value) {
+                        // if (value == null || value.isEmpty) {
+                        // 	 return 'please enter some text';
+                        // } else if (value.length < 5) {
+                        // 	 return 'Enter atleast 5 Charecter';
+                        // }
+                        // return null;
+                        // }),
                         // validator: MultiValidator([
                         //   RequiredValidator(errorText: 'Enter first named'),
                         //   MinLengthValidator(3,
@@ -63,8 +71,8 @@ class _RegisterState extends State<Register> {
                         // ]),
 
                         decoration: InputDecoration(
-                            hintText: 'Enter first Name',
-                            labelText: 'First name',
+                            hintText: 'Enter you Name',
+                            labelText: 'Name',
                             prefixIcon: Icon(
                               Icons.person,
                               color: Colors.green,
@@ -76,32 +84,32 @@ class _RegisterState extends State<Register> {
                                 BorderRadius.all(Radius.circular(9.0)))),
                       ),
                     ),
+                    // Padding(
+                    //   padding: const EdgeInsets.all(8.0),
+                    //   child: TextFormField(
+                    //     // validator: MultiValidator([
+                    //     //   RequiredValidator(errorText: 'Enter last named'),
+                    //     //   MinLengthValidator(3,
+                    //     //       errorText:
+                    //     //       'Last name should be atleast 3 charater'),
+                    //     // ]),
+                    //     decoration: InputDecoration(
+                    //         hintText: 'Enter last Name',
+                    //         labelText: 'Last name',
+                    //         prefixIcon: Icon(
+                    //           Icons.person,
+                    //           color: Colors.grey,
+                    //         ),
+                    //         errorStyle: TextStyle(fontSize: 18.0),
+                    //         border: OutlineInputBorder(
+                    //             borderSide: BorderSide(color: Colors.red),
+                    //             borderRadius:
+                    //             BorderRadius.all(Radius.circular(9.0)))),
+                    //   ),
+                    // ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: TextFormField(
-                        validator: MultiValidator([
-                          RequiredValidator(errorText: 'Enter last named'),
-                          MinLengthValidator(3,
-                              errorText:
-                              'Last name should be atleast 3 charater'),
-                        ]),
-                        decoration: InputDecoration(
-                            hintText: 'Enter last Name',
-                            labelText: 'Last name',
-                            prefixIcon: Icon(
-                              Icons.person,
-                              color: Colors.grey,
-                            ),
-                            errorStyle: TextStyle(fontSize: 18.0),
-                            border: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.red),
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(9.0)))),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextFormField(
+                      child: TextFormField(controller: mailTxtCnt,
                         // validator: MultiValidator([
                         //   RequiredValidator(errorText: 'Enter email address'),
                         //   EmailValidator(
@@ -123,12 +131,12 @@ class _RegisterState extends State<Register> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: TextFormField(
-                        validator: MultiValidator([
-                          RequiredValidator(errorText: 'Enter mobile number'),
-                          PatternValidator(r'(^[0,9]{10}$)',
-                              errorText: 'enter valid mobile number'),
-                        ]),
+                      child: TextFormField(controller: mobTxtCnt,
+                        // validator: MultiValidator([
+                        //   RequiredValidator(errorText: 'Enter mobile number'),
+                        //   PatternValidator(r'(^[0,9]{10}$)',
+                        //       errorText: 'enter valid mobile number'),
+                        // ]),
                         decoration: InputDecoration(
                             hintText: 'Mobile',
                             labelText: 'Mobile',
@@ -153,9 +161,7 @@ class _RegisterState extends State<Register> {
                                 style: TextStyle(color: Colors.white, fontSize: 22),
                               ),
                               onPressed: () {
-                                if (_formkey.currentState!.validate()) {
-                                  print('form submiitted');
-                                }
+                                nextpage(context);
                               },
                               // shape: RoundedRectangleBorder(
                               //     borderRadius: BorderRadius.circular(30)),
@@ -167,59 +173,8 @@ class _RegisterState extends State<Register> {
                             height: 50,
                           ),
                         )),
-                    // Center(
-                    //   child: Padding(
-                    //     padding: EdgeInsets.only(top: 20),
-                    //     child: Center(
-                    //       child: Text(
-                    //         'Or Sign Up Using',
-                    //         style: TextStyle(fontSize: 18, color: Colors.black),
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
-                    Center(
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 20, left: 90),
-                        child: Row(
-                          children: [
-                            // Container(
-                            //     height: 40,
-                            //     width: 40,
-                            //     child: Image.asset(
-                            //       'assets/google.png',
-                            //       fit: BoxFit.cover,
-                            //     )),
-                            // Container(
-                            //   height: 70,
-                            //   width: 70,
-                            //   child: Image.asset(
-                            //     'assets/vishal.png',
-                            //     fit: BoxFit.cover,
-                            //   ),
-                            // ),
-                            // Container(
-                            //   height: 40,
-                            //   width: 40,
-                            //   child: Image.asset(
-                            //     'assets/google.png',
-                            //     fit: BoxFit.cover,
-                            // //   ),
-                            // ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // Center(
-                    //   child: Container(
-                    //     padding: EdgeInsets.only(top: 40),
-                    //     child: Text(
-                    //       'SIGN IN',
-                    //       style: TextStyle(
-                    //           fontSize: 20, fontWeight: FontWeight.bold),
-                    //     ),
-                    //   ),
-                    // )
+
+
                   ],
                 )),
           ),
