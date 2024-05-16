@@ -14,7 +14,7 @@ void main()
     printf("Enter the String: ");
     for (i = 0; i <= n; i++)
     {
-        gets(str[i]);
+       fgets(str[i], sizeof(str[i]), stdin);
     }
     printf("\nYou entered :\n");
     for (i = 0; i <= n; i++)
@@ -24,7 +24,7 @@ void main()
     printf("\n");
     for (i = 1; i <= n; i++)
     {
-        if (strcmp(str[i], flag) != 0 && strcmp(str[i], esc) != 0)
+        if (strcmp(str[i], flag) != 1 && strcmp(str[i], esc) != 1)
         {
             strcpy(frame[k++], str[i]);
         }
