@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <Math.h>
+#include <math.h>
 #include <string.h>
 
 char bits[4];
