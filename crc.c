@@ -41,7 +41,7 @@ void crc(char data[])
             chk_val[j] = chk_val[j + 1];
         }
         chk_val[j] = data[i++];
-        printf("Remainder%d: %s\n", i - N, chk_val);
+        printf("Remainder%zu: %s\n", i - (size_t)N, chk_val);
     } while (i <= data_len + N - 1);
 }
 
