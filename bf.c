@@ -1,77 +1,103 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 
-int Bellman_Ford(int G[20][20], int V, int E, int edge[20][2]) {
-    int i, u, v, k, distance[20], parent[20], S, flag = 1;
+// Define a structure for an edge in the graph
+struct Edge {
+    int source, destination, weight;
+};
 
-    // Initialize distance and parent arrays
-    for (i = 0; i < V; i++) {
-        distance[i] = 1000;
+// Define a structure for a graph
+struct Graph {
+    int V, E;
+    struct Edge* edges;
+};
+
+// Function to create a graph with V vertices and E edges
+struct Graph* createGraph(int V, int E) {
+    struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
+    graph->V = V;
+    graph->E = E;
+    graph->edges = (struct Edge*)malloc(E * sizeof(struct Edge));
+    return graph;
+}
+
+// Function to run the Bellman-Ford algorithm
+void bellmanFord(struct Graph* graph, int source) {
+    int V = graph->V;
+    int E = graph->E;
+    int distance[V];
+    int parent[V];
+
+    // Initialize distances from source to all other vertices as INFINITE
+    for (int i = 0; i < V; i++) {
+        distance[i] = INT_MAX;
         parent[i] = -1;
     }
+    distance[source] = 0;
 
-    // Get the source vertex
-    printf("Enter source: ");
-    scanf("%d", &S);
-    distance[S - 1] = 0;
+    printf("Step\tVertex\tDistance\n");
 
-    // Relax edges repeatedly
-    for (i = 0; i < V - 1; i++) {
-        for (k = 0; k < E; k++) {
-            u = edge[k][0];
-            v = edge[k][1];
-            if (distance[u] + G[u][v] < distance[v]) {
-                distance[v] = distance[u] + G[u][v];
+    // Relax all edges |V| - 1 times
+    for (int i = 0; i < V - 1; i++) {
+        for (int j = 0; j < E; j++) {
+            int u = graph->edges[j].source;
+            int v = graph->edges[j].destination;
+            int w = graph->edges[j].weight;
+            if (distance[u] != INT_MAX && distance[u] + w < distance[v]) {
+                distance[v] = distance[u] + w;
                 parent[v] = u;
             }
         }
-    }
-
-    // Check for negative-weight cycles
-    for (k = 0; k < E; k++) {
-        u = edge[k][0];
-        v = edge[k][1];
-        if (distance[u] + G[u][v] < distance[v]) {
-            flag = 0;
+        // Print the current state of distances after relaxation in this iteration
+        for (int j = 0; j < V; j++) {
+            printf("%d\t%d\t", i + 1, j);
+            if (distance[j] == INT_MAX)
+                printf("INF\n");
+            else
+                printf("%d\n", distance[j]);
         }
     }
 
-    // Print the results
-    if (flag) {
-        for (i = 0; i < V; i++) {
-            printf("Vertex %d -> cost = %d parent = %d\n", i + 1, distance[i], parent[i] + 1);
+    // Check for negative weight cycles
+    for (int j = 0; j < E; j++) {
+        int u = graph->edges[j].source;
+        int v = graph->edges[j].destination;
+        int w = graph->edges[j].weight;
+        if (distance[u] != INT_MAX && distance[u] + w < distance[v]) {
+            printf("Graph contains negative weight cycle\n");
+            return;
         }
     }
-
-    return flag;
 }
 
 int main() {
-    int V, edge[20][2], G[20][20], i, j, k = 0;
+    int V, E;
+    printf("Enter number of vertices and edges: ");
+    scanf("%d%d", &V, &E);
 
-    printf("BELLMAN FORD\n");
-    printf("Enter number of vertices: ");
-    scanf("%d", &V);
+    struct Graph* graph = createGraph(V, E);
 
-    // Get the graph matrix input
-    printf("Enter graph in matrix form (input 0 for no edge, positive value for edge weight):\n");
-    for (i = 0; i < V; i++) {
-        for (j = 0; j < V; j++) {
-            printf("G[%d][%d] = ", i + 1, j + 1);
-            scanf("%d", &G[i][j]);
-            if (G[i][j] != 0) {
-                edge[k][0] = i;
-                edge[k++][1] = j;
-            }
-        }
+    printf("Enter source, destination, and weight for each edge:\n");
+    for (int i = 0; i < E; i++) {
+        printf("Edge %d:\n", i + 1);
+        printf("Source: ");
+        scanf("%d", &graph->edges[i].source);
+        printf("Destination: ");
+        scanf("%d", &graph->edges[i].destination);
+        printf("Weight: ");
+        scanf("%d", &graph->edges[i].weight);
     }
 
-    // Run the Bellman-Ford algorithm
-    if (Bellman_Ford(G, V, k, edge)) {
-        printf("\nNo negative weight cycle\n");
-    } else {
-        printf("\nNegative weight cycle exists\n");
-    }
+    int source;
+    printf("Enter source vertex: ");
+    scanf("%d", &source);
+
+    bellmanFord(graph, source);
+
+    // Free dynamically allocated memory
+    free(graph->edges);
+    free(graph);
 
     return 0;
 }
