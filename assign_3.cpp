@@ -1,5 +1,5 @@
 #include <iostream>
-#include<queue>
+#include <queue>
 using namespace std;
 
 struct TreeNode {
@@ -11,8 +11,7 @@ struct TreeNode {
 TreeNode* createNode(int val) {
     TreeNode* newNode = new TreeNode;
     newNode->data = val;
-    newNode->left = nullptr;
-    newNode->right = nullptr;
+    newNode->left = newNode->right = nullptr;
     return newNode;
 }
 
@@ -36,7 +35,6 @@ int height(TreeNode* root) {
     int rightHeight = height(root->right);
     return max(leftHeight, rightHeight) + 1;
 }
-
 
 int countNodes(TreeNode* root) {
     if (root == nullptr) {
@@ -97,6 +95,20 @@ void deleteTree(TreeNode* root) {
     delete root;
 }
 
+void mirror(TreeNode* root) {
+    if (root == nullptr) {
+        return;
+    }
+    // Swap the left and right subtrees
+    TreeNode* temp = root->left;
+    root->left = root->right;
+    root->right = temp;
+    
+    // Recursively apply mirror to left and right subtrees
+    mirror(root->left);
+    mirror(root->right);
+}
+
 int main() {
     TreeNode* root = nullptr;
 
@@ -129,11 +141,33 @@ int main() {
     cout << endl;
 
     cout << "Nodes of the BST level-wise: ";
+    // Assuming printLevelWise function is defined elsewhere
     // printLevelWise(root);
     // cout << endl;
+
+    // Mirror the tree and print its properties again
+    mirror(root);
+    cout << "Mirror image of the BST created." << endl;
+
+    h = height(root);
+    cout << "Height of the mirrored BST: " << h << endl;
+
+    numNodes = countNodes(root);
+    cout << "Number of nodes in the mirrored BST: " << numNodes << endl;
+
+    numLeafNodes = countLeafNodes(root);
+    cout << "Number of leaf nodes in the mirrored BST: " << numLeafNodes << endl;
+
+    minNode = findMin(root);
+    maxNode = findMax(root);
+    cout << "Minimum node value in mirrored BST: " << minNode << endl;
+    cout << "Maximum node value in mirrored BST: " << maxNode << endl;
+
+    cout << "Leaf nodes of the mirrored BST: ";
+    printLeafNodes(root);
+    cout << endl;
 
     deleteTree(root);
 
     return 0;
 }
-
