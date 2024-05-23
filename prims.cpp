@@ -1,67 +1,119 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <utility>
+// A C++ program for Prim's Minimum
+// Spanning Tree (MST) algorithm. The program is
+// for adjacency matrix representation of the graph
+#include<iostream>
+#include <bits/stdc++.h>
 
 using namespace std;
 
-const int INF = 1e9;  
+// Number of vertices in the graph
+#define V 5
 
-void primsAlgorithm(int n, vector<vector<pair<int, int>>> &adj) {
-    vector<int> key(n, INF);
-    vector<int> parent(n, -1);
-    vector<bool> inMST(n, false);
+// A utility function to find the vertex with
+// minimum key value, from the set of vertices
+// not yet included in MST
+int minKey(int key[], bool mstSet[])
+{
+	// Initialize min value
+	int min = INT_MAX, min_index;
 
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+	for (int v = 0; v < V; v++)
+		if (mstSet[v] == false && key[v] < min)
+			min = key[v], min_index = v;
 
-    
-    key[0] = 0;
-    pq.push({0, 0});  
-
-    while (!pq.empty()) {
-        int u = pq.top().second;
-        pq.pop();
-
-        if (inMST[u]) continue;
-        inMST[u] = true;
-
-        for (auto &edge : adj[u]) {
-            int v = edge.first;
-            int weight = edge.second;
-
-            if (!inMST[v] && weight < key[v]) {
-                key[v] = weight;
-                pq.push({key[v], v});
-                parent[v] = u;
-            }
-        }
-    }
-
-    
-    cout << "Edges in the Minimum Spanning Tree:" << endl;
-    for (int i = 1; i < n; ++i) {
-        cout << parent[i] << " - " << i << endl;
-    }
+	return min_index;
 }
 
-int main() {
-    int n, m;
-    cout << "Enter the number of vertices: ";
-    cin >> n;
-    cout << "Enter the number of edges: ";
-    cin >> m;
+// A utility function to print the
+// constructed MST stored in parent[]
+void printMST(int parent[], int graph[V][V])
+{
+	cout << "Edge \tWeight\n";
+	for (int i = 1; i < V; i++)
+		cout << parent[i] << " - " << i << " \t"
+			<< graph[i][parent[i]] << " \n";
+}
 
-    vector<vector<pair<int, int>>> adj(n);
+// Function to construct and print MST for
+// a graph represented using adjacency
+// matrix representation
+void primMST(int graph[V][V], int startvertex)
+{
+	// Array to store constructed MST
+	int parent[V];
 
-    cout << "Enter the edges (u, v, w) format, 0-based indexing:" << endl;
-    for (int i = 0; i < m; ++i) {
-        int u, v, w;
-        cin >> u >> v >> w;
-        adj[u].push_back({v, w});
-        adj[v].push_back({u, w});
+	// Key values used to pick minimum weight edge in cut
+	int key[V];
+
+	// To represent set of vertices included in MST
+	bool mstSet[V];
+
+	// Initialize all keys as INFINITE
+	for (int i = 0; i < V; i++)
+		key[i] = INT_MAX, mstSet[i] = false;
+
+	// Always include first 1st vertex in MST.
+	// Make key 0 so that this vertex is picked as first
+	// vertex.
+	key[startvertex] = 0;
+
+	// First node is always root of MST
+	parent[startvertex] = -1;
+
+	// The MST will have V vertices
+	for (int count = 0; count < V - 1; count++) {
+		
+		// Pick the minimum key vertex from the
+		// set of vertices not yet included in MST
+		int u = minKey(key, mstSet);
+
+		// Add the picked vertex to the MST Set
+		mstSet[u] = true;
+
+		// Update key value and parent index of
+		// the adjacent vertices of the picked vertex.
+		// Consider only those vertices which are not
+		// yet included in MST
+		for (int v = 0; v < V; v++)
+
+			// graph[u][v] is non zero only for adjacent
+			// vertices of m mstSet[v] is false for vertices
+			// not yet included in MST Update the key only
+			// if graph[u][v] is smaller than key[v]
+			if (graph[u][v] && mstSet[v] == false
+				&& graph[u][v] < key[v])
+				parent[v] = u, key[v] = graph[u][v];
+	}
+
+	// Print the constructed MST
+	printMST(parent, graph);
+}
+
+// Driver's code
+int main()
+{
+	int graph[V][V] ;
+
+    int e;
+    cout<<"enter the no of edges: "<<endl;
+    cin>>e;
+
+    for(int i=0;i<e;i++){
+        int u,v,w;
+        cout<<"enter the start and end node and weight (u,v,w):"<<endl;
+        cin>>u>>v>>w;
+
+        graph[u][v]=w;
+        graph[v][u]=w;
     }
 
-    primsAlgorithm(n, adj);
+    int startvertex;
+    cout<<"enter the startvertx:"<<endl;
+    cin>>startvertex;
+	// Print the solution
+	primMST(graph,startvertex);
 
-    return 0;
+	return 0;
 }
+
+// This code is contributed by rathbhupendra
