@@ -1,135 +1,3 @@
-// #include <iostream>
-// #include <algorithm>
-// #include <queue>
-// using namespace std;
-
-// // Node structure for the binary tree
-// struct Node {
-//     int data;
-//     Node* left;
-//     Node* right;
-// };
-
-// // Function to create a new node
-// Node* createNode(int value) {
-//     Node* newNode = new Node();
-//     newNode->data = value;
-//     newNode->left = newNode->right = nullptr;
-//     return newNode;
-// }
-
-// // Function to calculate the height of a tree
-// int height(Node* root) {
-//     if (root == nullptr)
-//         return 0;
-//     return max(height(root->left), height(root->right)) + 1;
-// }
-
-// // Function to calculate the balance factor of a node
-// int balanceFactor(Node* root) {
-//     if (root == nullptr)
-//         return 0;
-//     return height(root->left) - height(root->right);
-// }
-
-// // Function to insert a value into the binary tree
-// Node* insertNode(Node* root, int value) {
-//     if (root == nullptr)
-//         return createNode(value);
-    
-//     if (value < root->data)
-//         root->left = insertNode(root->left, value);
-//     else if (value > root->data)
-//         root->right = insertNode(root->right, value);
-    
-//     // Calculate balance factor after each insertion
-//     cout << "Balance Factor after inserting " << value << ": " << balanceFactor(root) << endl;
-
-//     return root;
-// }
-
-// // Function to perform left rotation
-// Node* leftRotation(Node* root) {
-//     Node* newRoot = root->right;
-//     root->right = newRoot->left;
-//     newRoot->left = root;
-//     return newRoot;
-// }
-
-// // Function to perform right rotation
-// Node* rightRotation(Node* root) {
-//     Node* newRoot = root->left;
-//     root->left = newRoot->right;
-//     newRoot->right = root;
-//     return newRoot;
-// }
-
-// // Function to identify rotation cases for AVL balancing
-// Node* avlBalancing(Node* root) {
-//     int bf = balanceFactor(root);
-
-//     if (abs(bf) <= 1)
-//         return root; // Tree is balanced
-
-//     if (bf > 1) {
-//         if (balanceFactor(root->left) < 0) {
-//             // LR Rotation Case
-//             root->left = leftRotation(root->left);
-//         }
-//         // LL Rotation Case
-//         root = rightRotation(root);
-//     } else {
-//         if (balanceFactor(root->right) > 0) {
-//             // RL Rotation Case
-//             root->right = rightRotation(root->right);
-//         }
-//         // RR Rotation Case
-//         root = leftRotation(root);
-//     }
-//     return root;
-// }
-
-// // Function to perform level order traversal (BFS) of the tree
-// void levelOrderTraversal(Node* root) {
-//     if (root == nullptr)
-//         return;
-
-//     queue<Node*> q;
-//     q.push(root);
-
-//     while (!q.empty()) {
-//         Node* current = q.front();
-//         q.pop();
-//         cout << current->data << " ";
-
-//         if (current->left != nullptr)
-//             q.push(current->left);
-//         if (current->right != nullptr)
-//             q.push(current->right);
-//     }
-// }
-
-// int main() {
-//     Node* root = nullptr;
-//     int n, value;
-
-//     cout << "Enter the number of nodes in the binary tree: ";
-//     cin >> n;
-
-//     cout << "Enter the values of the nodes: ";
-//     for (int i = 0; i < n; ++i) {
-//         cin >> value;
-//         root = insertNode(root, value);
-//         // Rebalance the tree after each insertion
-//         root = avlBalancing(root);
-//     }
-
-//     cout << "Tree (Level Order Traversal): ";
-//     levelOrderTraversal(root);
-//     cout << endl;
-
-//     return 0;
-// }
 #include <iostream>
 #include <algorithm>
 using namespace std;
@@ -180,14 +48,6 @@ int balanceFactor(Node* node) {
     return height(node->left) - height(node->right);
 }
 
-void printBalanceFactors(Node* root) {
-    if (root != nullptr) {
-        printBalanceFactors(root->left);
-        cout << "Node " << root->data << " has balance factor " << balanceFactor(root) << endl;
-        printBalanceFactors(root->right);
-    }
-}
-
 Node* leftRotation(Node* x) {
     Node* y = x->right;
     Node* T2 = y->left;
@@ -218,6 +78,30 @@ Node* rightLeftRotation(Node* z) {
     return leftRotation(z);
 }
 
+Node* balanceTree(Node* root) {
+    if (root == nullptr) {
+        return root;
+    }
+
+    int bf = balanceFactor(root);
+
+    if (bf > 1) {
+        if (balanceFactor(root->left) > 0) {
+            root = rightRotation(root);
+        } else {
+            root = leftRightRotation(root);
+        }
+    } else if (bf < -1) {
+        if (balanceFactor(root->right) < 0) {
+            root = leftRotation(root);
+        } else {
+            root = rightLeftRotation(root);
+        }
+    }
+
+    return root;
+}
+
 bool isBalanced(Node* root) {
     if (root == nullptr) {
         return true;
@@ -232,27 +116,11 @@ bool isBalanced(Node* root) {
     return isBalanced(root->left) && isBalanced(root->right);
 }
 
-void checkAVL(Node* root) {
-    if (isBalanced(root)) {
-        cout << "The tree is balanced and AVL.\n";
-    } else {
-        cout << "The tree is not AVL.\n";
-
-        int bf = balanceFactor(root);
-
-        if (bf > 1) {
-            if (balanceFactor(root->left) > 0) {
-                cout << "Left-Left rotation required.\n";
-            } else {
-                cout << "Left-Right rotation required.\n";
-            }
-        } else {
-            if (balanceFactor(root->right) < 0) {
-                cout << "Right-Right rotation required.\n";
-            } else {
-                cout << "Right-Left rotation required.\n";
-            }
-        }
+void printInorder(Node* root) {
+    if (root != nullptr) {
+        printInorder(root->left);
+        cout << root->data << " ";
+        printInorder(root->right);
     }
 }
 
@@ -262,8 +130,10 @@ int main() {
 
     do {
         cout << "1. Insert node\n";
-        cout << "2. Check if the tree is balanced and AVL\n";
-        cout << "3. Exit\n";
+        cout << "2. Balance the tree\n";
+        cout << "3. Check if the tree is balanced and AVL\n";
+        cout << "4. Print balanced tree (Inorder traversal)\n";
+        cout << "5. Exit\n";
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -272,18 +142,30 @@ int main() {
                 cout << "Enter data to insert: ";
                 cin >> data;
                 root = insertNode(root, data);
-                printBalanceFactors(root);
                 break;
             case 2:
-                checkAVL(root);
+                root = balanceTree(root);
+                cout << "Tree balanced successfully.\n";
                 break;
             case 3:
+                if (isBalanced(root)) {
+                    cout << "The tree is balanced and AVL.\n";
+                } else {
+                    cout << "The tree is not AVL.\n";
+                }
+                break;
+            case 4:
+                cout << "Balanced tree (Inorder traversal): ";
+                printInorder(root);
+                cout << endl;
+                break;
+            case 5:
                 cout << "Exiting...\n";
                 break;
             default:
                 cout << "Invalid choice. Please try again.\n";
         }
-    } while (choice != 3);
+    } while (choice != 5);
 
     return 0;
 }
