@@ -88,3 +88,11 @@ int main() {
 
     return 0;
 }
+
+/*
+"$AMJ020100120003\n"
+"GD20 LR20 CR33 BT07\n"
+"$DTA\n"
+"hope for it\n"
+"$END 0201"
+*/
