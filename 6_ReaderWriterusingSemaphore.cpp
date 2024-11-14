@@ -8,7 +8,7 @@ using namespace std;
 //sample input 
 //3
 //2
-//2
+//3
 
 // Semaphore to control access to the shared resource
 sem_t resource_sem;  // Binary semaphore for controlling the resource
