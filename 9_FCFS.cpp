@@ -97,3 +97,10 @@ int main() {
     solve(procs, rq, at, bt, ct);
     return 0;
 }
+
+/*
+3
+P1 P2 P3
+0 1 2
+20 2 2  
+*/
