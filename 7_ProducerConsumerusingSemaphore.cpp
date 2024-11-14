@@ -8,7 +8,7 @@ using namespace std;
 //sample input
 //5
 //5
-//3
+//2
 
 vector<int> buffer;
 sem_t empty_slots, full_slots;
