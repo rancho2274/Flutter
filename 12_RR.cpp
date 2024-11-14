@@ -1,95 +1,102 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
+#include <stdio.h>
+#include <stdlib.h>
 
-using namespace std;
-
-void findWaitingTime(vector<int>& processes, int n, vector<int>& bt, vector<int>& at, vector<int>& wt, int quantum) {
-    vector<int> rem_bt(n);
-    for (int i = 0; i < n; i++)
-        rem_bt[i] = bt[i];
-
-    int t = 0;  // Track the current time
-
-    while (1) {
-        bool done = true;
-
-        for (int i = 0; i < n; i++) {
-            if (rem_bt[i] > 0 && at[i] <= t) {  // Process must have arrived
-                done = false;
-
-                if (rem_bt[i] > quantum) {
-                    t += quantum;
-                    rem_bt[i] -= quantum;
-                } else {
-                    t += rem_bt[i];
-                    wt[i] = t - bt[i] - at[i];  // Calculate waiting time considering arrival time
-                    rem_bt[i] = 0;
-                }
-            }
-        }
-
-        if (done)
-            break;
-
-        // Move to the next time unit if no process has arrived
-        for (int i = 0; i < n; i++) {
-            if (at[i] > t) {
-                t = at[i];
-                break;
-            }
-        }
-    }
-}
-
-void findTurnAroundTime(vector<int>& processes, int n, vector<int>& bt, vector<int>& wt, vector<int>& tat) {
-    for (int i = 0; i < n; i++)
-        tat[i] = bt[i] + wt[i];
-}
-
-void findAvgTime(vector<int>& processes, int n, vector<int>& bt, vector<int>& at, int quantum) {
-    vector<int> wt(n), tat(n);
-    int total_wt = 0, total_tat = 0;
-
-    findWaitingTime(processes, n, bt, at, wt, quantum);
-    findTurnAroundTime(processes, n, bt, wt, tat);
-
-    cout << "PN\tAT\tBT\tWT\tTAT\n";
-
-    for (int i = 0; i < n; i++) {
-        total_wt += wt[i];
-        total_tat += tat[i];
-        cout << processes[i] << "\t" << at[i] << "\t" << bt[i] << "\t" << wt[i] << "\t" << tat[i] << endl;
-    }
-
-    cout << "Average waiting time = " << (float)total_wt / n << endl;
-    cout << "Average turn around time = " << (float)total_tat / n << endl;
-}
+struct process {
+    int arrivalTime;
+    int burstTime;
+    int finishTime;
+    int turnTime;
+    int waitingTime;
+    int startTime;
+};
 
 int main() {
-    int n;
-    cout << "Enter the number of processes: ";
-    cin >> n;
+    int n, tq, total_TAT = 0, BT[50], total_WT = 0, index;
+    struct process p[50];
+    float avgTAT, avgWT;
 
-    vector<int> processes(n);
-    cout << "Enter process IDs: ";
-    for (int i = 0; i < n; i++)
-        cin >> processes[i];
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
 
-    vector<int> burst_time(n);
-    cout << "Enter burst times for each process: ";
-    for (int i = 0; i < n; i++)
-        cin >> burst_time[i];
+    printf("Enter time quantum of CPU: ");
+    scanf("%d", &tq);
 
-    vector<int> arrival_time(n);
-    cout << "Enter arrival times for each process: ";
-    for (int i = 0; i < n; i++)
-        cin >> arrival_time[i];
+    // Separate input for arrival times
+    for (int i = 0; i < n; i++) {
+        printf("Enter arrival time of process %d: ", i + 1);
+        scanf("%d", &p[i].arrivalTime);
+    }
 
-    int quantum;
-    cout << "Enter time quantum: ";
-    cin >> quantum;
+    // Separate input for burst times
+    for (int i = 0; i < n; i++) {
+        printf("Enter burst time of process %d: ", i + 1);
+        scanf("%d", &p[i].burstTime);
+        BT[i] = p[i].burstTime;
+    }
 
-    findAvgTime(processes, n, burst_time, arrival_time, quantum);
+    int q[100], front = -1, rear = -1;
+    q[++rear] = 0;
+
+    int current_time = 0;
+    int completed = 0;
+    int mark[100] = {0};
+    while (completed != n) {
+        index = q[++front];
+
+        // to find start time of process
+        if (BT[index] == p[index].burstTime) {
+            p[index].startTime = current_time > p[index].arrivalTime ? current_time
+                                                                     : p[index].arrivalTime;
+            current_time = p[index].startTime;
+        }
+
+        // check if process if finished nor not
+        if (BT[index] > tq) {
+            BT[index] -= tq;
+            current_time += tq;
+        } else {
+            current_time += BT[index];
+
+            p[index].finishTime = current_time;
+            p[index].turnTime = p[index].finishTime - p[index].arrivalTime;
+            p[index].waitingTime = p[index].turnTime - p[index].burstTime;
+            total_WT += p[index].waitingTime;
+            total_TAT += p[index].turnTime;
+            completed++;
+
+            BT[index] = 0;
+        }
+
+        // add new processes to queue of at <= CT
+        for (int i = 1; i < n; i++) {
+            if (BT[i] > 0 && p[i].arrivalTime <= current_time && !mark[i]) {
+                mark[i] = 1;
+                q[++rear] = i;
+            }
+        }
+
+        // enter current process again in queue if it not finished
+        if (BT[index] > 0) {
+            q[++rear] = index;
+        }
+    }
+
+    avgWT = (float)total_WT / n;
+    avgTAT = (float)total_TAT / n;
+    printf("\n");
+    printf("Process\tAT\tBT\tFT\tTAT\tWT\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%d\t%d\t%d\t%d\t%d\n",
+               i + 1,
+               p[i].arrivalTime,
+               p[i].burstTime,
+               p[i].finishTime,
+               p[i].turnTime,
+               p[i].waitingTime);
+    }
+    printf("\n");
+    printf("Average Waiting Time = %.2f\n", avgWT);
+    printf("Average Turnaround Time = %.2f\n", avgTAT);
     return 0;
 }
+ //input 4 && arrival : 0 1 2 4 && brust : 5 4 2 1 && TQ = 2
