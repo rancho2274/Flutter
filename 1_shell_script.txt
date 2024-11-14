@@ -1,0 +1,154 @@
+Sum of digits
+
+#!/bin/bash
+
+# Static input - hardcoding the number
+number=123
+
+# Function to calculate the sum of digits of a given number
+sum_of_digits() {
+  local number=$1
+  local sum=0
+  while [ $number -gt 0 ]; do
+    sum=$((sum + number % 10))
+    number=$((number / 10))
+  done
+  echo $sum
+}
+
+# Calculate and print the sum of digits
+sum=$(sum_of_digits $number)
+echo "The sum of digits of $number is: $sum"
+
+2) avg, mean , max
+
+calculate_average() {
+    local sum=0
+    local count=$#
+
+    for number in "$@"; do
+        sum=$(echo "$sum + $number" | bc)
+    done
+
+    average=$(echo "scale=2; $sum / $count" | bc)
+    echo "Average: $average"
+}
+
+find_minimum() {
+    local min="$1"
+
+    for number in "$@"; do
+        if [ "$number" -lt "$min" ]; then
+            min="$number"
+        fi
+    done
+
+    echo "Minimum: $min"
+}
+
+find_maximum() {
+    local max="$1"
+
+    for number in "$@"; do
+        if [ "$number" -gt "$max" ]; then
+            max="$number"
+        fi
+    done
+
+    echo "Maximum: $max"
+}
+
+# Static input
+number="123456"
+
+# Convert the number to individual digits
+digits=$(echo "$number" | grep -o .)
+
+# Convert the digits to an array
+digits_array=($digits)
+
+# Call the functions
+calculate_average "${digits_array[@]}"
+find_minimum "${digits_array[@]}"
+find_maximum "${digits_array[@]}"
+
+
+3) Sorting 
+bubble_sort() {
+  numbers=("$@")
+  n=${#numbers[@]}
+
+  for ((i = 0; i < n-1; i++));
+  do
+    for ((j = 0; j < n-i-1; j++));
+    do
+      if [ "${numbers[j]}" -gt "${numbers[$((j+1))]}" ]; then
+        temp=${numbers[j]}
+        numbers[j]=${numbers[$((j+1))]}
+        numbers[$((j+1))]=$temp
+      fi
+    done
+  done
+
+  echo "Sorted numbers in ascending order: ${numbers[@]}"
+}
+
+# Static input
+input_numbers=(34 7 23 32 5 62)
+
+echo "Input numbers: ${input_numbers[@]}"
+
+# Call the bubble_sort function with the static array
+bubble_sort "${input_numbers[@]}"
+
+
+4) Factorial 
+With recurssion 
+
+factorial() {
+  local num=$1
+  if [ $num -lt 2 ]; then
+    echo 1
+  else
+    local prev_factorial=$(factorial $((num - 1)))
+    echo $((num * prev_factorial))
+  fi
+}
+
+# Static input
+number=5  # Change this value to the desired number
+
+if ! [[ $number =~ ^[0-9]+$ ]]; then
+  echo "Invalid input. Please enter a positive integer."
+  exit 1
+fi
+
+result=$(factorial $number)
+echo "Factorial of $number is $result"
+
+
+Without recurssion
+
+factorial() {
+  local num=$1
+  local result=1
+
+  while [ $num -gt 1 ]; do
+    result=$((result * num))
+    num=$((num - 1))
+  done
+
+  echo $result
+}
+
+# Static input
+number=5  # Set your desired number here
+
+# Validate input
+if ! [[ $number =~ ^[0-9]+$ ]]; then
+  echo "Invalid input. Please enter a positive integer."
+  exit 1
+fi
+
+result=$(factorial $number)
+echo "Factorial of $number is $result"
