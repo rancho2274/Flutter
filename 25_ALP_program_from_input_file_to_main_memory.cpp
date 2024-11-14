@@ -51,3 +51,13 @@ int main() {
 
     return 0;
 }
+/*
+; Sample Assembly Language Program
+; This is a simple program to test the loader functionality
+
+START:   MOV AX, 5      ; Load the value 5 into register AX
+         ADD AX, 3      ; Add 3 to the value in AX
+         MOV BX, AX     ; Copy the value from AX to BX
+         INT 20h        ; Terminate the program
+
+; End of Program*/
